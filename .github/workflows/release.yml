@@ -47,3 +47,20 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # BuildKit writes an SPDX SBOM attestation for this resolver image.
+          sbom: true
+
+      - name: Export resolver image SBOM
+        run: |
+          docker buildx imagetools inspect \
+            "ghcr.io/${{ github.repository_owner }}/oversync-resolver:${{ github.ref_name }}" \
+            --format '{{ json .SBOM }}' > resolver-image-sbom.json
+          grep -q SPDX resolver-image-sbom.json
+
+      - name: Upload resolver image SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: resolver-image-sbom
+          path: resolver-image-sbom.json
+          # Each tag rebuilds the resolver image SBOM, so keep the artifact for 14 days.
+          retention-days: 14

@@ -80,7 +80,7 @@ The following components are explicitly excluded from the smart contract audit. 
 |---|---|---|---|
 | `ci.yml` | Push/PR to `master`, `main`, `v2-rebuild` | TypeScript build + typechecks (SDK, coordinator, resolver, frontend); SDK/frontend/coordinator tests; Hardhat contract tests; Soroban build + `cargo test` | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
 | `contracts.yml` | Push/PR touching `contracts/**` | Foundry fuzz + invariant tests; Slither static analysis on v2 contracts with artifact upload | [`.github/workflows/contracts.yml`](../.github/workflows/contracts.yml) |
-| `release.yml` | Tag `v*` | Build and push resolver Docker image to `ghcr.io` | [`.github/workflows/release.yml`](../.github/workflows/release.yml) |
+| `release.yml` | Tag `v*` | Build and push resolver Docker image to `ghcr.io`. The build attaches an SPDX SBOM and uploads it as `resolver-image-sbom` (14-day retention). | [`.github/workflows/release.yml`](../.github/workflows/release.yml) |
 
 ### 3.3 Static analysis
 
