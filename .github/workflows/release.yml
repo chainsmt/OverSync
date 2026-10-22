@@ -38,6 +38,27 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
+      # Load the resolver image into the local Docker engine, then scan it with
+      # Aqua Trivy (aquasecurity/trivy-action) before anything is published.
+      # severity CRITICAL,HIGH plus exit-code 1 fails this job on HIGH or
+      # CRITICAL findings, so the push step below does not run.
+      - name: Build resolver image locally
+        uses: docker/build-push-action@v6
+        with:
+          context: ./resolver
+          file: ./resolver/Dockerfile
+          load: true
+          push: false
+          tags: oversync-resolver:scan
+
+      - name: Scan resolver image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: oversync-resolver:scan
+          format: table
+          exit-code: "1"
+          severity: CRITICAL,HIGH
+
       - name: Build + push
         uses: docker/build-push-action@v6
         with:

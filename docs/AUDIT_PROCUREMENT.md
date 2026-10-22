@@ -80,7 +80,9 @@ The following components are explicitly excluded from the smart contract audit. 
 |---|---|---|---|
 | `ci.yml` | Push/PR to `master`, `main`, `v2-rebuild` | TypeScript build + typechecks (SDK, coordinator, resolver, frontend); SDK/frontend/coordinator tests; Hardhat contract tests; Soroban build + `cargo test` | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
 | `contracts.yml` | Push/PR touching `contracts/**` | Foundry fuzz + invariant tests; Slither static analysis on v2 contracts with artifact upload | [`.github/workflows/contracts.yml`](../.github/workflows/contracts.yml) |
-| `release.yml` | Tag `v*` | Build and push resolver Docker image to `ghcr.io` | [`.github/workflows/release.yml`](../.github/workflows/release.yml) |
+| `release.yml` | Tag `v*` | Build the resolver image, block on Trivy HIGH/CRITICAL findings, then push to `ghcr.io` | [`.github/workflows/release.yml`](../.github/workflows/release.yml) |
+
+On a `v*` tag, `release.yml` loads a single-platform image (`oversync-resolver:scan`) from `resolver/Dockerfile` into the local Docker engine. It then scans that image with Aqua Trivy via `aquasecurity/trivy-action@v0.36.0`. The scan sets `severity: CRITICAL,HIGH` and `exit-code: "1"`, so any HIGH or CRITICAL vulnerability fails the job before the multi-arch `docker push` to `ghcr.io`.
 
 ### 3.3 Static analysis
 
